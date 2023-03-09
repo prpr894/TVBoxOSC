@@ -52,6 +52,8 @@ public class ApiDialog extends BaseDialog {
     private TextView tvAddress;
     private EditText inputApi;
     private String algorithm = "AES";
+    private EditText mEditTextUrl;
+    private EditText mEditTextPwd;
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void refresh(RefreshEvent event) {
@@ -68,21 +70,24 @@ public class ApiDialog extends BaseDialog {
         tvAddress = findViewById(R.id.tvAddress);
         inputApi = findViewById(R.id.input);
         inputApi.setText(Hawk.get(HawkConfig.API_URL, ""));
-        findViewById(R.id.inputSubmit).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String newApi = inputApi.getText().toString().trim();
-                if (!newApi.isEmpty() && (newApi.startsWith("http") || newApi.startsWith("clan"))) {
-                    addToHistory(newApi);
-                    listener.onchange(newApi);
-                    dismiss();
-                }
+        mEditTextUrl = findViewById(R.id.input_history);
+        mEditTextPwd = findViewById(R.id.input_pwd);
+        mEditTextUrl.setText(Hawk.get("iKun_url", ""));
+        mEditTextPwd.setText(Hawk.get("iKun_pwd", ""));
+        findViewById(R.id.inputSubmit).setOnClickListener(v -> {
+            String newApi = inputApi.getText().toString().trim();
+            if (!newApi.isEmpty() && (newApi.startsWith("http") || newApi.startsWith("clan"))) {
+                ArrayList<String> newApis = new ArrayList<>();
+                newApis.add(newApi);
+                addToHistory(newApis);
+                listener.onchange(newApi);
+                dismiss();
             }
         });
         findViewById(R.id.apiHistory).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<String> history = Hawk.get(HawkConfig.API_HISTORY, new ArrayList<String>());
+                ArrayList<String> history = Hawk.get(HawkConfig.API_HISTORY, new ArrayList<>());
                 if (history.isEmpty()) return;
                 String current = Hawk.get(HawkConfig.API_URL, "");
                 int idx = 0;
@@ -138,14 +143,16 @@ public class ApiDialog extends BaseDialog {
         findViewById(R.id.inputHistorySubmit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EditText editTextUrl = findViewById(R.id.input_history);
-                String url = editTextUrl.getText().toString();
+                final String url = mEditTextUrl.getText().toString();
+                final String pwd = mEditTextPwd.getText().toString();
                 if (TextUtils.isEmpty(url)) {
                     return;
                 }
                 OkGo.<String>get(url).execute(new AbsCallback<String>() {
                     @Override
                     public void onSuccess(Response<String> response) {
+                        Hawk.put("iKun_url", url);
+                        Hawk.put("iKun_pwd", pwd);
                         parsHistoryJsonData(response);
                     }
 
@@ -164,10 +171,6 @@ public class ApiDialog extends BaseDialog {
                         return result;
                     }
                 });
-                String newApi = inputApi.getText().toString().trim();
-                if (!newApi.isEmpty() && (newApi.startsWith("http") || newApi.startsWith("clan"))) {
-                    addToHistory(newApi);
-                }
             }
         });
 
@@ -175,12 +178,9 @@ public class ApiDialog extends BaseDialog {
 
     private void parsHistoryJsonData(Response<String> response) {
         try {
-            EditText editTextPwd = findViewById(R.id.input_pwd);
-            String pwd = editTextPwd.getText().toString();
+            String pwd = mEditTextPwd.getText().toString();
             String json;
             String rlt_str = response.body();
-            Log.d("rlt_str", rlt_str);
-            Log.d("pwd", "pwd: "+ pwd);
             if (TextUtils.isEmpty(pwd)) {
                 json = rlt_str;
             } else {
@@ -191,28 +191,33 @@ public class ApiDialog extends BaseDialog {
                 byte[] decrypt = cipher.doFinal(Base64.decode(rlt_str, Base64.NO_WRAP));
                 json = new String(decrypt);
             }
-            Log.d("json", json);
-
             JSONObject object = new JSONObject(json);
             if (object.has("data")) {
+                ArrayList<String> newApis = new ArrayList<>();
                 JSONArray data = object.getJSONArray("data");
                 for (int i = 0; i < data.length(); i++) {
                     JSONObject o = (JSONObject) data.get(i);
                     if (o.has("url")) {
-                        addToHistory(o.getString("url"));
+                        String newApi = o.getString("url");
+                        if (!newApi.isEmpty() && (newApi.startsWith("http") || newApi.startsWith("clan"))) {
+                            newApis.add(newApi);
+                        }
                     }
                 }
+                addToHistory(newApis);
             }
         } catch (Throwable th) {
             th.printStackTrace();
         }
     }
 
-    private void addToHistory(String newApi) {
-        ArrayList<String> history = Hawk.get(HawkConfig.API_HISTORY, new ArrayList<String>());
-        if (!history.contains(newApi)) history.add(0, newApi);
+    private void addToHistory(ArrayList<String> newApis) {
+        ArrayList<String> history = Hawk.get(HawkConfig.API_HISTORY, new ArrayList<>());
+        for (String newApi : newApis) {
+            if (!history.contains(newApi)) history.add(0, newApi);
 //                    if (history.size() > 10)
 //                        history.remove(10);
+        }
         Hawk.put(HawkConfig.API_HISTORY, history);
     }
 
