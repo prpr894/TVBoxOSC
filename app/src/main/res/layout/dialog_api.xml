@@ -104,6 +104,80 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/ll_apiHistory"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="@dimen/vs_5"
+                        android:layout_weight="1"
+                        android:orientation="horizontal">
+
+                        <EditText
+                            android:id="@+id/input_history"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@drawable/input_dialog_api_input"
+                            android:hint="1.1 历史配置地址"
+                            android:inputType="text"
+                            android:maxLines="1"
+                            android:paddingLeft="@dimen/vs_2"
+                            android:paddingTop="@dimen/vs_10"
+                            android:paddingRight="@dimen/vs_2"
+                            android:paddingBottom="@dimen/vs_10"
+                            android:shadowColor="@color/color_000000_60"
+                            android:shadowDx="0"
+                            android:shadowDy="0"
+                            android:shadowRadius="3"
+                            android:textColor="@color/color_FFFFFF"
+                            android:textColorHint="@color/color_FFFFFF_50"
+                            android:textSize="@dimen/ts_22" />
+
+                        <EditText
+                            android:id="@+id/input_pwd"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="3"
+                            android:background="@drawable/input_dialog_api_input"
+                            android:hint="密码(如果有)"
+                            android:inputType="textPassword"
+                            android:maxLines="1"
+                            android:paddingLeft="@dimen/vs_2"
+                            android:paddingTop="@dimen/vs_10"
+                            android:paddingRight="@dimen/vs_2"
+                            android:paddingBottom="@dimen/vs_10"
+                            android:shadowColor="@color/color_000000_60"
+                            android:shadowDx="0"
+                            android:shadowDy="0"
+                            android:shadowRadius="3"
+                            android:textColor="@color/color_FFFFFF"
+                            android:textColorHint="@color/color_FFFFFF_50"
+                            android:textSize="@dimen/ts_22" />
+
+                        <LinearLayout
+                            android:id="@+id/apiHistoryAdd"
+                            android:layout_width="@dimen/vs_80"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="@dimen/vs_5"
+                            android:layout_marginLeft="@dimen/vs_5"
+                            android:background="@drawable/shape_setting_model_focus"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:orientation="horizontal"
+                            android:padding="@dimen/vs_10">
+                            <TextView
+                                android:id="@+id/inputHistorySubmit"
+                                android:layout_width="@dimen/vs_80"
+                                android:layout_height="match_parent"
+                                android:layout_gravity="center"
+                                android:gravity="center"
+                                android:text="加载"
+                                android:textColor="@color/color_FFFFFF"
+                                android:textSize="@dimen/ts_22" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
                         android:id="@+id/ll_liveHistory"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -153,67 +227,51 @@
 
                     </LinearLayout>
 
-                    <LinearLayout
-                        android:id="@+id/ll_EPGHistory"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginBottom="@dimen/vs_5"
-                        android:layout_weight="1"
-                        android:orientation="horizontal">
+<!--                    <LinearLayout-->
+<!--                        android:id="@+id/ll_EPGHistory"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:layout_marginBottom="@dimen/vs_5"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:orientation="horizontal">-->
 
-                <EditText
-                    android:id="@+id/input_history"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:background="@drawable/input_dialog_api_input"
-                    android:hint="历史配置地址"
-                    android:inputType="text"
-                    android:maxLines="1"
-                    android:paddingLeft="@dimen/vs_2"
-                    android:paddingTop="@dimen/vs_10"
-                    android:paddingRight="@dimen/vs_2"
-                    android:paddingBottom="@dimen/vs_10"
-                    android:textColor="@color/color_CC000000"
-                    android:textColorHint="@color/color_6C3D3D3D"
-                    android:textSize="@dimen/ts_26" />
+<!--                <EditText-->
+<!--                    android:id="@+id/input_history"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="2"-->
+<!--                    android:background="@drawable/input_dialog_api_input"-->
+<!--                    android:hint="历史配置地址"-->
+<!--                    android:inputType="text"-->
+<!--                    android:maxLines="1"-->
+<!--                    android:paddingLeft="@dimen/vs_2"-->
+<!--                    android:paddingTop="@dimen/vs_10"-->
+<!--                    android:paddingRight="@dimen/vs_2"-->
+<!--                    android:paddingBottom="@dimen/vs_10"-->
+<!--                    android:textColor="@color/color_FFFFFF"-->
+<!--                    android:textColorHint="@color/color_FFFFFF_50"-->
+<!--                    android:textSize="@dimen/ts_26" />-->
 
-                <EditText
-                    android:id="@+id/input_pwd"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3"
-                    android:background="@drawable/input_dialog_api_input"
-                    android:hint="密码(如果有)"
-                    android:inputType="textPassword"
-                    android:maxLines="1"
-                    android:paddingLeft="@dimen/vs_2"
-                    android:paddingTop="@dimen/vs_10"
-                    android:paddingRight="@dimen/vs_2"
-                    android:paddingBottom="@dimen/vs_10"
-                    android:textColor="@color/color_CC000000"
-                    android:textColorHint="@color/color_6C3D3D3D"
-                    android:textSize="@dimen/ts_26" />
+<!--                <EditText-->
+<!--                    android:id="@+id/input_pwd"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="3"-->
+<!--                    android:background="@drawable/input_dialog_api_input"-->
+<!--                    android:hint="密码(如果有)"-->
+<!--                    android:inputType="textPassword"-->
+<!--                    android:maxLines="1"-->
+<!--                    android:paddingLeft="@dimen/vs_2"-->
+<!--                    android:paddingTop="@dimen/vs_10"-->
+<!--                    android:paddingRight="@dimen/vs_2"-->
+<!--                    android:paddingBottom="@dimen/vs_10"-->
+<!--                    android:textColor="@color/color_FFFFFF"-->
+<!--                    android:textColorHint="@color/color_FFFFFF_50"-->
+<!--                    android:textSize="@dimen/ts_26" />-->
 
-                <TextView
-                    android:id="@+id/inputHistorySubmit"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="@dimen/vs_5"
-                    android:background="@drawable/button_dialog_main"
-                    android:focusable="true"
-                    android:gravity="center"
-                    android:padding="@dimen/vs_10"
-                    android:text="加载"
-                    android:textColor="@color/color_FFFFFF"
-                    android:textSize="@dimen/ts_22" />
-            </LinearLayout>
 
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/vs_0"
-                android:layout_weight="1" />
+<!--            </LinearLayout>-->
+
 
             <LinearLayout
                 android:layout_width="match_parent"

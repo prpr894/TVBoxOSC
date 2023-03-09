@@ -27,7 +27,7 @@
         android:lineSpacingExtra="@dimen/ts_50"
         android:lineSpacingMultiplier="0"
         android:text="\n修改版开源地址："
-        android:textColor="@color/color_CC000000"
+        android:textColor="@color/color_FFFFFF"
         android:textSize="@dimen/ts_24" />
 
     <TextView
@@ -37,7 +37,7 @@
         android:lineSpacingMultiplier="0"
         android:autoLink="web"
         android:text="https://github.com/prpr894/TVBoxOSC"
-        android:textColor="@color/color_CC000000"
+        android:textColor="@color/color_FFFFFF"
         android:textSize="@dimen/ts_24" />
 
 </LinearLayout>

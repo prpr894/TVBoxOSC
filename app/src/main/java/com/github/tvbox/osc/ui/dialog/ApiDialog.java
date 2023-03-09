@@ -54,9 +54,6 @@ public class ApiDialog extends BaseDialog {
     private final EditText inputApi;
     private final EditText inputLive;
     private final EditText inputEPG;
-    private ImageView ivQRCode;
-    private TextView tvAddress;
-    private EditText inputApi;
     private String algorithm = "AES";
     private EditText mEditTextUrl;
     private EditText mEditTextPwd;
@@ -86,14 +83,6 @@ public class ApiDialog extends BaseDialog {
         mEditTextPwd = findViewById(R.id.input_pwd);
         mEditTextUrl.setText(Hawk.get("iKun_url", ""));
         mEditTextPwd.setText(Hawk.get("iKun_pwd", ""));
-        findViewById(R.id.inputSubmit).setOnClickListener(v -> {
-            String newApi = inputApi.getText().toString().trim();
-            if (!newApi.isEmpty() && (newApi.startsWith("http") || newApi.startsWith("clan"))) {
-                ArrayList<String> newApis = new ArrayList<>();
-                newApis.add(newApi);
-                addToHistory(newApis);
-                listener.onchange(newApi);
-                dismiss();
 
         // takagen99: Add Live & EPG Address
         inputLive = findViewById(R.id.input_live);
@@ -114,12 +103,9 @@ public class ApiDialog extends BaseDialog {
                     newApi = newApi.replace("./", "clan://localhost/");
                 }
                 if (!newApi.isEmpty()) {
-                    ArrayList<String> history = Hawk.get(HawkConfig.API_HISTORY, new ArrayList<String>());
-                    if (!history.contains(newApi))
-                        history.add(0, newApi);
-                    if (history.size() > 20)
-                        history.remove(20);
-                    Hawk.put(HawkConfig.API_HISTORY, history);
+                    ArrayList<String> newApis = new ArrayList<>();
+                    newApis.add(newApi);
+                    addToHistory(newApis);
                     listener.onchange(newApi);
                     dismiss();
                 }
@@ -257,7 +243,7 @@ public class ApiDialog extends BaseDialog {
         refreshQRCode();
 
 
-        findViewById(R.id.inputHistorySubmit).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.apiHistoryAdd).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final String url = mEditTextUrl.getText().toString();
