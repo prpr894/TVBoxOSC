@@ -2,13 +2,14 @@ package com.github.tvbox.osc.ui.dialog;
 
 import android.app.Activity;
 import android.content.Context;
+import android.text.TextUtils;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.event.RefreshEvent;
@@ -19,15 +20,25 @@ import com.github.tvbox.osc.util.HawkConfig;
 import com.hjq.permissions.OnPermissionCallback;
 import com.hjq.permissions.Permission;
 import com.hjq.permissions.XXPermissions;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.AbsCallback;
+import com.lzy.okgo.model.Response;
 import com.orhanobut.hawk.Hawk;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+
+import androidx.annotation.NonNull;
 import me.jessyan.autosize.utils.AutoSizeUtils;
 
 /**
@@ -40,6 +51,7 @@ public class ApiDialog extends BaseDialog {
     private ImageView ivQRCode;
     private TextView tvAddress;
     private EditText inputApi;
+    private String algorithm = "AES";
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void refresh(RefreshEvent event) {
@@ -61,12 +73,7 @@ public class ApiDialog extends BaseDialog {
             public void onClick(View v) {
                 String newApi = inputApi.getText().toString().trim();
                 if (!newApi.isEmpty() && (newApi.startsWith("http") || newApi.startsWith("clan"))) {
-                    ArrayList<String> history = Hawk.get(HawkConfig.API_HISTORY, new ArrayList<String>());
-                    if (!history.contains(newApi))
-                        history.add(0, newApi);
-                    if (history.size() > 10)
-                        history.remove(10);
-                    Hawk.put(HawkConfig.API_HISTORY, history);
+                    addToHistory(newApi);
                     listener.onchange(newApi);
                     dismiss();
                 }
@@ -76,12 +83,10 @@ public class ApiDialog extends BaseDialog {
             @Override
             public void onClick(View v) {
                 ArrayList<String> history = Hawk.get(HawkConfig.API_HISTORY, new ArrayList<String>());
-                if (history.isEmpty())
-                    return;
+                if (history.isEmpty()) return;
                 String current = Hawk.get(HawkConfig.API_URL, "");
                 int idx = 0;
-                if (history.contains(current))
-                    idx = history.indexOf(current);
+                if (history.contains(current)) idx = history.indexOf(current);
                 ApiHistoryDialog dialog = new ApiHistoryDialog(getContext());
                 dialog.setTip("历史配置列表");
                 dialog.setAdapter(new ApiHistoryDialogAdapter.SelectDialogInterface() {
@@ -106,30 +111,109 @@ public class ApiDialog extends BaseDialog {
                 if (XXPermissions.isGranted(getContext(), Permission.Group.STORAGE)) {
                     Toast.makeText(getContext(), "已获得存储权限", Toast.LENGTH_SHORT).show();
                 } else {
-                    XXPermissions.with(getContext())
-                            .permission(Permission.Group.STORAGE)
-                            .request(new OnPermissionCallback() {
-                                @Override
-                                public void onGranted(List<String> permissions, boolean all) {
-                                    if (all) {
-                                        Toast.makeText(getContext(), "已获得存储权限", Toast.LENGTH_SHORT).show();
-                                    }
-                                }
+                    XXPermissions.with(getContext()).permission(Permission.Group.STORAGE).request(new OnPermissionCallback() {
+                        @Override
+                        public void onGranted(List<String> permissions, boolean all) {
+                            if (all) {
+                                Toast.makeText(getContext(), "已获得存储权限", Toast.LENGTH_SHORT).show();
+                            }
+                        }
 
-                                @Override
-                                public void onDenied(List<String> permissions, boolean never) {
-                                    if (never) {
-                                        Toast.makeText(getContext(), "获取存储权限失败,请在系统设置中开启", Toast.LENGTH_SHORT).show();
-                                        XXPermissions.startPermissionActivity((Activity) getContext(), permissions);
-                                    } else {
-                                        Toast.makeText(getContext(), "获取存储权限失败", Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            });
+                        @Override
+                        public void onDenied(List<String> permissions, boolean never) {
+                            if (never) {
+                                Toast.makeText(getContext(), "获取存储权限失败,请在系统设置中开启", Toast.LENGTH_SHORT).show();
+                                XXPermissions.startPermissionActivity((Activity) getContext(), permissions);
+                            } else {
+                                Toast.makeText(getContext(), "获取存储权限失败", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
                 }
             }
         });
         refreshQRCode();
+
+
+        findViewById(R.id.inputHistorySubmit).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText editTextUrl = findViewById(R.id.input_history);
+                String url = editTextUrl.getText().toString();
+                if (TextUtils.isEmpty(url)) {
+                    return;
+                }
+                OkGo.<String>get(url).execute(new AbsCallback<String>() {
+                    @Override
+                    public void onSuccess(Response<String> response) {
+                        parsHistoryJsonData(response);
+                    }
+
+                    @Override
+                    public void onError(Response<String> response) {
+                        super.onError(response);
+                    }
+
+                    public String convertResponse(okhttp3.Response response) throws Throwable {
+                        String result;
+                        if (response.body() == null) {
+                            result = "";
+                        } else {
+                            result = response.body().string();
+                        }
+                        return result;
+                    }
+                });
+                String newApi = inputApi.getText().toString().trim();
+                if (!newApi.isEmpty() && (newApi.startsWith("http") || newApi.startsWith("clan"))) {
+                    addToHistory(newApi);
+                }
+            }
+        });
+
+    }
+
+    private void parsHistoryJsonData(Response<String> response) {
+        try {
+            EditText editTextPwd = findViewById(R.id.input_pwd);
+            String pwd = editTextPwd.getText().toString();
+            String json;
+            String rlt_str = response.body();
+            Log.d("rlt_str", rlt_str);
+            Log.d("pwd", "pwd: "+ pwd);
+            if (TextUtils.isEmpty(pwd)) {
+                json = rlt_str;
+            } else {
+                byte[] bytes = Arrays.copyOf(pwd.getBytes(), 32);
+                SecretKeySpec des = new SecretKeySpec(bytes, algorithm);
+                Cipher cipher = Cipher.getInstance(algorithm);
+                cipher.init(Cipher.DECRYPT_MODE, des);
+                byte[] decrypt = cipher.doFinal(Base64.decode(rlt_str, Base64.NO_WRAP));
+                json = new String(decrypt);
+            }
+            Log.d("json", json);
+
+            JSONObject object = new JSONObject(json);
+            if (object.has("data")) {
+                JSONArray data = object.getJSONArray("data");
+                for (int i = 0; i < data.length(); i++) {
+                    JSONObject o = (JSONObject) data.get(i);
+                    if (o.has("url")) {
+                        addToHistory(o.getString("url"));
+                    }
+                }
+            }
+        } catch (Throwable th) {
+            th.printStackTrace();
+        }
+    }
+
+    private void addToHistory(String newApi) {
+        ArrayList<String> history = Hawk.get(HawkConfig.API_HISTORY, new ArrayList<String>());
+        if (!history.contains(newApi)) history.add(0, newApi);
+//                    if (history.size() > 10)
+//                        history.remove(10);
+        Hawk.put(HawkConfig.API_HISTORY, history);
     }
 
     private void refreshQRCode() {
