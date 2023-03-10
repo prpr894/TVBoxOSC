@@ -1,7 +1,5 @@
 package com.github.tvbox.osc.ui.activity;
 
-import static xyz.doikki.videoplayer.util.PlayerUtils.stringForTimeVod;
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
@@ -19,9 +17,6 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.github.tvbox.osc.R;
@@ -81,8 +76,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import xyz.doikki.videoplayer.player.VideoView;
 import xyz.doikki.videoplayer.util.PlayerUtils;
+
+import static xyz.doikki.videoplayer.util.PlayerUtils.stringForTimeVod;
 
 /**
  * @author pj567
@@ -444,6 +443,7 @@ public class LivePlayActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        isActivityNotDestroyed = false;
         if (mVideoView != null) {
             mVideoView.release();
             mVideoView = null;
@@ -932,6 +932,7 @@ public class LivePlayActivity extends BaseActivity {
                 }
                 return true;
             }
+
             @Override
             public void longPress() {
                 showSettingGroup();
@@ -996,16 +997,27 @@ public class LivePlayActivity extends BaseActivity {
         mVideoView.setProgressManager(null);
     }
 
+    private boolean isActivityNotDestroyed = true;
     private final Runnable mConnectTimeoutChangeSourceRun = new Runnable() {
+        private int mConnectTimeoutChangeChannelTimes;
+
         @Override
         public void run() {
-            currentLiveChangeSourceTimes++;
-            if (currentLiveChannelItem.getSourceNum() == currentLiveChangeSourceTimes) {
-                currentLiveChangeSourceTimes = 0;
-                Integer[] groupChannelIndex = getNextChannel(Hawk.get(HawkConfig.LIVE_CHANNEL_REVERSE, false) ? -1 : 1);
-                playChannel(groupChannelIndex[0], groupChannelIndex[1], false);
-            } else {
-                playNextSource();
+            if (isActivityNotDestroyed) {
+                currentLiveChangeSourceTimes++;
+                if (currentLiveChannelItem.getSourceNum() == currentLiveChangeSourceTimes) {
+                    currentLiveChangeSourceTimes = 0;
+                    if (mConnectTimeoutChangeChannelTimes < 10) {//最多切换10个频道，有些源成百上千的失效频道，要了命简直。
+                        Integer[] groupChannelIndex = getNextChannel(Hawk.get(HawkConfig.LIVE_CHANNEL_REVERSE, false) ? -1 : 1);
+                        playChannel(groupChannelIndex[0], groupChannelIndex[1], false);
+                        mConnectTimeoutChangeChannelTimes++;
+                    } else {
+                        mConnectTimeoutChangeChannelTimes = 0;
+                        runOnUiThread(() ->  Toast.makeText(App.getInstance(), "过多频道失效，已停止播放", Toast.LENGTH_SHORT).show());
+                    }
+                } else {
+                    playNextSource();
+                }
             }
         }
     };
