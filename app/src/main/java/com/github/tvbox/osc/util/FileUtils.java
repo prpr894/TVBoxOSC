@@ -72,14 +72,18 @@ public class FileUtils {
     }
 
     public static void recursiveDelete(File file) {
-        if (!file.exists())
-            return;
-        if (file.isDirectory()) {
-            for (File f : file.listFiles()) {
-                recursiveDelete(f);
+        try {
+            if (!file.exists())
+                return;
+            if (file.isDirectory()) {
+                for (File f : file.listFiles()) {
+                    recursiveDelete(f);
+                }
             }
+            file.delete();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        file.delete();
     }
 
     public static String loadModule(String name) {
@@ -192,4 +196,25 @@ public class FileUtils {
         return getExternalCacheDir().getAbsolutePath();
     }
 
+    public static String getCachePath() {
+        return getCacheDir().getAbsolutePath();
+    }
+    
+    public static void cleanPlayerCache() {
+        String thunderCachePath = getCachePath() + "/thunder/";
+        File thunderCacheDir = new File(thunderCachePath);
+        try {
+            if (thunderCacheDir.exists()) recursiveDelete(thunderCacheDir);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String ijkCachePath = getExternalCachePath() + "/ijkcaches/";
+        File ijkCacheDir = new File(ijkCachePath);
+        try {
+            if (ijkCacheDir.exists()) recursiveDelete(ijkCacheDir);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

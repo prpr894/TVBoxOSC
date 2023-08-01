@@ -30,6 +30,7 @@
     <string name="det_expand">Expand</string>
     <string name="det_search">Search</string>
     <string name="det_sort">Sort</string>
+    <string name="det_push">Push</string>
     <string name="det_fav">Favorite</string>
     <string name="det_fav_add">Added to Favorite</string>
     <string name="det_fav_del">Removed from Favorite</string>
@@ -68,6 +69,7 @@
     <string name="mn_locale">Language</string>
     <string name="mn_theme">Theme</string>
     <string name="mn_about">About</string>
+    <string name="mn_purify">Purify</string>
 
     // Settings Dialog Pop-Up //
     <string name="dia_source">Select Source</string>
@@ -146,6 +148,8 @@
     <string name="vod_sub_delay">Delay</string>
     <string name="vod_sub_search">Search</string>
     <string name="vod_sub_off">Subtitle Off</string>
+    <string name="vod_remaining_time">Remaining Time</string>
+    <string name="vod_ends_at">Ends at</string>
 
     // EXO Player
     <string name="exo_track_selection_title_video">Video</string>

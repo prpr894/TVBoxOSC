@@ -30,6 +30,7 @@
     <string name="det_expand">全屏</string>
     <string name="det_search">快搜</string>
     <string name="det_sort">倒序</string>
+    <string name="det_push">推送</string>
     <string name="det_fav">收藏</string>
     <string name="det_fav_add">已添加收藏</string>
     <string name="det_fav_del">已取消收藏</string>
@@ -68,6 +69,7 @@
     <string name="mn_locale">语言</string>
     <string name="mn_theme">主题</string>
     <string name="mn_about">关于</string>
+    <string name="mn_purify">净化</string>
 
     // Settings Dialog Pop-Up //
     <string name="dia_source">请选择数据源</string>
@@ -146,6 +148,8 @@
     <string name="vod_sub_delay">延迟</string>
     <string name="vod_sub_search">搜索</string>
     <string name="vod_sub_off">字幕已关闭</string>
+    <string name="vod_remaining_time">影片剩余</string>
+    <string name="vod_ends_at">影片结束</string>
 
     // EXO Player
     <string name="exo_track_selection_title_video">视频</string>

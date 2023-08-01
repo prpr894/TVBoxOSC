@@ -8,6 +8,8 @@ import com.orhanobut.hawk.Hawk;
  * @description:
  */
 public class HawkConfig {
+    public static final String PUSH_TO_ADDR = "push_to_addr"; // 推送到地址的IP
+    public static final String PUSH_TO_PORT = "push_to_port"; // 推送到地址的端口
     // URL Configurations
     public static final String API_URL = "api_url";
     public static final String API_HISTORY = "api_history";
@@ -35,6 +37,7 @@ public class HawkConfig {
     public static final String PLAY_SCALE = "play_scale";   //
     public static final String PLAY_TIME_STEP = "play_time_step";
     public static final String PIC_IN_PIC = "pic_in_pic";   // true = on, false = off
+    public static final String VIDEO_PURIFY = "video_purify";
 
     // Other Settings
     public static final String DOH_URL = "doh_url";         // DNS
